@@ -19,7 +19,6 @@
 import SwiftUI
 
 class PlaceDescription {
-    
     var name: String
     var description: String
     var category: String

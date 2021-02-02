@@ -18,6 +18,50 @@
 
 import SwiftUI
 
+class PlaceDescription {
+    
+    var name: String
+    var description: String
+    var category: String
+    var addressTitle: String
+    var addressStreet: String
+    var elevation: Float
+    var latitude: Float
+    var longitude: Float
+    
+    init(json: [String: Any]) {
+        name = json["name"] as? String ?? ""
+        description = json["description"] as? String ?? ""
+        category = json["category"] as? String ?? ""
+        addressTitle = json["address-title"] as? String ?? ""
+        addressStreet = json["address-street"] as? String ?? ""
+        elevation = json["elevation"] as? Float ?? 0
+        latitude = json["latitude"] as? Float ?? 0
+        longitude = json["longitude"] as? Float ?? 0
+    }
+    
+    init(jsonStr: String) {
+        self.name = ""
+        self.description = ""
+        self.category = ""
+        self.addressTitle = ""
+        self.addressStreet = ""
+        self.elevation = 0
+        self.latitude = 0
+        self.longitude = 0
+        
+        if let data: Data = jsonStr.data(using: String.Encoding.utf8) {
+            do {
+                let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers)
+                print(json)
+            } catch let jsonErr {
+                print("Error serializing JSON:", jsonErr)
+            }
+        }
+    }
+    
+}
+
 struct LabelTextField : View {
     var label: String
     @State var placeHolder: String
@@ -36,8 +80,7 @@ struct LabelTextField : View {
 }
 
 struct ContentView: View {
-    @State private var placeDescription = PlaceDescription(name: "Home", description: "Home", category: "residence", address: Address(title: "Joseph Lee", street: "1741 W Flamingo Dr", city: "Chandler", state: "AZ", country: "US", zipCode: "85286"), elevation: 1384.0, latitude: 33.27532, longitude: -111.87144)
-
+    @State private var placeDescription = PlaceDescription(jsonStr: "{\"name\": \"ASU-Poly\",\"description\": \"Home of ASU\'s Software Engineering Programs\", \"category\": \"School\", \"address-title\": \"ASU Software Engineering\", \"address-street\": \"7171 W Sonoran Arroyo Mall\\nPeralta Hall 230\\nMesa AZ 85212\", \"elevation\": 1384.0, \"latitude\": 33.306388, \"longitude\": -111.679121}")
     
     var body: some View {
         List {
@@ -45,15 +88,14 @@ struct ContentView: View {
                 LabelTextField(label: "Name", placeHolder: placeDescription.name)
                 LabelTextField(label: "Description", placeHolder: placeDescription.description)
                 LabelTextField(label: "Category", placeHolder: placeDescription.category)
-                LabelTextField(label: "Address Title", placeHolder: placeDescription.address.title)
-                LabelTextField(label: "Address", placeHolder: placeDescription.address.street + "\n" + placeDescription.address.city + ", " + placeDescription.address.state + " " + placeDescription.address.zipCode + "\n" + placeDescription.address.country)
+                LabelTextField(label: "Address Title", placeHolder: placeDescription.addressTitle)
+                LabelTextField(label: "Address Street", placeHolder: placeDescription.addressStreet)
                 LabelTextField(label: "Elevation", placeHolder: String(format: "%.1f", placeDescription.elevation))
                 LabelTextField(label: "Latitude", placeHolder: String(format: "%.6f", placeDescription.latitude))
                 LabelTextField(label: "Longitude", placeHolder: String(format: "%.6f", placeDescription.longitude))
             }
             .listRowInsets(EdgeInsets())
         }
-        
     }
 }
 

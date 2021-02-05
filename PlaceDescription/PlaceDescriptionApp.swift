@@ -22,7 +22,7 @@ import SwiftUI
 struct PlaceDescriptionApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(jsonStr: "")
         }
     }
 }

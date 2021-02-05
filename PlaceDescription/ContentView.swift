@@ -74,7 +74,7 @@ struct LabelTextField : View {
     var body: some View {
         VStack(alignment: .leading) {
             Text(label).font(.headline).lineLimit(/*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/)
-            Text(placeHolder)
+            Text("\(placeHolder)")
                 .padding(.all)
                 .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
                 .cornerRadius(/*@START_MENU_TOKEN@*/5.0/*@END_MENU_TOKEN@*/)
@@ -84,56 +84,103 @@ struct LabelTextField : View {
     }
 }
 
-var placeDescription = PlaceDescription()
-
-struct ContentView: View {
-    @State var jsonStr: String = ""
+struct TextView: UIViewRepresentable {
+    typealias UIViewType = UITextView
+    var placeholderText: String
+    @Binding var text: String
     
-    var body: some View {
-        NavigationView {
-            VStack {
-                Form {
-                    Section {
-                        TextField("Enter JSON", text: $jsonStr)
-                            .lineLimit(3)
-                    }
-                }
-                
-                Button(action: {
-                    placeDescription = PlaceDescription(jsonStr: jsonStr)
-                }, label: {
-                    Text("Init PlaceDescription with JSON")
-                        .frame(width: 300, height: 50, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                })
-                .padding()
-                
-                NavigationLink(
-                    destination: PlaceDescriptionView(),
-                    label: {
-                        DisplayPlaceDescriptionButton(color: .green)
-                    })
+    func makeUIView(context: UIViewRepresentableContext<TextView>) -> UITextView {
+        let textView = UITextView()
+        
+        textView.textContainer.lineFragmentPadding = 0
+        textView.textContainerInset = .zero
+        textView.font = UIFont.systemFont(ofSize: 17)
+        
+        textView.text = placeholderText
+        textView.textColor = .placeholderText
+        
+        return textView
+    }
+    
+    func updateUIView(_ uiView: UITextView, context: UIViewRepresentableContext<TextView>) {
+        
+        if text != "" || uiView.textColor == .label {
+            uiView.text = text
+            uiView.textColor = .label
+        }
+        uiView.delegate = context.coordinator
+    }
+    
+    func frame(numLines: CGFloat) -> some View {
+        let height = UIFont.systemFont(ofSize: 17).lineHeight * numLines
+        return self.frame(height: height)
+    }
+    
+    func makeCoordinator() -> TextView.Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, UITextViewDelegate {
+        var parent: TextView
+        
+        init(_ parent: TextView) {
+            self.parent = parent
+        }
+        
+        func textViewDidChange(_ textView: UITextView) {
+            parent.text = textView.text
+        }
+        
+        func textViewDidBeginEditing(_ textView: UITextView) {
+            if textView.textColor == .placeholderText {
+                textView.text = ""
+                textView.textColor = .label
             }
-            .navigationTitle("Place Description JSON")
+        }
+        
+        func textViewDidEndEditing(_ textView: UITextView) {
+            if textView.text == "" {
+                textView.text = parent.placeholderText
+                textView.textColor = .placeholderText
+            }
         }
     }
 }
 
-struct PlaceDescriptionView: View {
+struct ContentView: View {
+    @State var jsonStr: String
+    @State var placeDescription = PlaceDescription()
+
     var body: some View {
-        VStack(alignment: .leading) {
-            LabelTextField(label: "Name", placeHolder: placeDescription.name)
-            LabelTextField(label: "Description", placeHolder: placeDescription.description)
-            LabelTextField(label: "Category", placeHolder: placeDescription.category)
-            LabelTextField(label: "Address Title", placeHolder: placeDescription.addressTitle)
-            LabelTextField(label: "Address Street", placeHolder: placeDescription.addressStreet)
-            LabelTextField(label: "Elevation", placeHolder: String(format: "%.1f", placeDescription.elevation))
-            LabelTextField(label: "Latitude", placeHolder: String(format: "%.6f", placeDescription.latitude))
-            LabelTextField(label: "Longitude", placeHolder: String(format: "%.6f", placeDescription.longitude))
+        VStack {
+            Form {
+                Section {
+                    TextView(placeholderText: "Enter JSON for PlaceDescription", text: $jsonStr).frame(numLines: 10)
+                    
+                    Button(action: {
+                        placeDescription = PlaceDescription(jsonStr: jsonStr)
+                    }, label: {
+                        Text("Init PlaceDescription with JSON")
+                            .frame(width: 300, height: 50, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    })
+                    .padding()
+                }
+                
+                Section {
+                    LabelTextField(label: "Name", placeHolder: placeDescription.name)
+                    LabelTextField(label: "Description", placeHolder: placeDescription.description)
+                    LabelTextField(label: "Category", placeHolder: placeDescription.category)
+                    LabelTextField(label: "Address Title", placeHolder: placeDescription.addressTitle)
+                    LabelTextField(label: "Address Street", placeHolder: placeDescription.addressStreet)
+                    LabelTextField(label: "Elevation", placeHolder: String(format: "%.1f", placeDescription.elevation))
+                    LabelTextField(label: "Latitude", placeHolder: String(format: "%.6f", placeDescription.latitude))
+                    LabelTextField(label: "Longitude", placeHolder: String(format: "%.6f", placeDescription.longitude))
+                }
+            }
         }
-        .navigationTitle("PlaceDescription")
     }
 }
 
@@ -151,7 +198,7 @@ struct DisplayPlaceDescriptionButton: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(jsonStr: "")
             .preferredColorScheme(.light)
     }
 }

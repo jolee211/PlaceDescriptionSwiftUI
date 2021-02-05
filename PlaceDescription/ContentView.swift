@@ -67,23 +67,6 @@ class PlaceDescription {
     
 }
 
-struct LabelTextField : View {
-    var label: String
-    @State var placeHolder: String
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text(label).font(.headline).lineLimit(/*@START_MENU_TOKEN@*/2/*@END_MENU_TOKEN@*/)
-            Text("\(placeHolder)")
-                .padding(.all)
-                .background(Color(red: 239.0/255.0, green: 243.0/255.0, blue: 244.0/255.0, opacity: 1.0))
-                .cornerRadius(/*@START_MENU_TOKEN@*/5.0/*@END_MENU_TOKEN@*/)
-                .lineLimit(3)
-        }
-        .padding(.horizontal, 15)
-    }
-}
-
 struct TextView: UIViewRepresentable {
     typealias UIViewType = UITextView
     var placeholderText: String
@@ -170,29 +153,17 @@ struct ContentView: View {
                 }
                 
                 Section {
-                    LabelTextField(label: "Name", placeHolder: placeDescription.name)
-                    LabelTextField(label: "Description", placeHolder: placeDescription.description)
-                    LabelTextField(label: "Category", placeHolder: placeDescription.category)
-                    LabelTextField(label: "Address Title", placeHolder: placeDescription.addressTitle)
-                    LabelTextField(label: "Address Street", placeHolder: placeDescription.addressStreet)
-                    LabelTextField(label: "Elevation", placeHolder: String(format: "%.1f", placeDescription.elevation))
-                    LabelTextField(label: "Latitude", placeHolder: String(format: "%.6f", placeDescription.latitude))
-                    LabelTextField(label: "Longitude", placeHolder: String(format: "%.6f", placeDescription.longitude))
+                    Text("Name: \(placeDescription.name)")
+                    Text("Description: \(placeDescription.description)")
+                    Text("Category: \(placeDescription.category)")
+                    Text("Address Title: \(placeDescription.addressTitle)")
+                    Text("Address Street: \(placeDescription.addressStreet)")
+                    Text("Elevation: \(String(format: "%.1f", placeDescription.elevation))")
+                    Text("Latitude: \(String(format: "%.6f", placeDescription.latitude))")
+                    Text("Longitude: \(String(format: "%.6f", placeDescription.longitude))")
                 }
             }
         }
-    }
-}
-
-struct DisplayPlaceDescriptionButton: View {
-    let color: Color
-    
-    var body: some View {
-        Text("Display PlaceDescription")
-            .frame(width: 200, height: 50, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-            .background(color)
-            .foregroundColor(.white)
-            .cornerRadius(8)
     }
 }
 

@@ -65,6 +65,36 @@ class PlaceDescription {
         }
     }
     
+    func toDictionary() -> Dictionary<String, Any> {
+        // make a dictionary
+        var dict = Dictionary<String, Any>()
+        
+        dict["name"] = self.name
+        dict["description"] = self.description
+        dict["category"] = self.category
+        dict["address-title"] = self.addressTitle
+        dict["address-street"] = self.addressStreet
+        dict["elevation"] = self.elevation
+        dict["latitude"] = self.latitude
+        dict["longitude"] = self.longitude
+        
+        return dict
+    }
+    
+    func toJsonString() -> String {
+        // convert values to dictionary
+        let dict = toDictionary()
+        var jsonStr = ""
+        do {
+            let jsonData:Data = try JSONSerialization.data(withJSONObject: dict, options: JSONSerialization.WritingOptions.prettyPrinted)
+            jsonStr = String(data: jsonData, encoding: String.Encoding.utf8)! as String
+        } catch let error as Error {
+            print(error)
+        }
+        
+        return jsonStr
+    }
+    
 }
 
 struct TextView: UIViewRepresentable {
@@ -161,6 +191,10 @@ struct ContentView: View {
                     Text("Elevation: \(String(format: "%.1f", placeDescription.elevation))")
                     Text("Latitude: \(String(format: "%.6f", placeDescription.latitude))")
                     Text("Longitude: \(String(format: "%.6f", placeDescription.longitude))")
+                }
+                
+                Section {
+                    Text("PlaceDescription.toJsonString(): \(placeDescription.toJsonString())")
                 }
             }
         }
